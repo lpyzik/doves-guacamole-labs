@@ -1,32 +1,42 @@
 version: "3.9"
 
+# =========================
+# NETWORKS
+# =========================
 networks:
   doves:
     driver: bridge
   guacnet:
     driver: bridge
 
+# =========================
+# VOLUMES
+# =========================
 volumes:
   postgres_data:
   doves_data:
   guacd_drive:
   guacd_record:
 
+# =========================
+# SERVICES
+# =========================
 services:
+
   # =========================
-  # FRONTEND
+  # FRONTEND (DoVEs React)
   # =========================
   frontend:
     build:
       context: ./doves/doves-frontend
       args:
-        REACT_APP_DOVES_API_URL: /api
+        REACT_APP_DOVES_API_URL: ${REACT_APP_DOVES_API_URL}
     restart: unless-stopped
     networks:
       - doves
 
   # =========================
-  # BACKEND
+  # BACKEND (DoVEs API)
   # =========================
   backend:
     build:
@@ -35,23 +45,27 @@ services:
     depends_on:
       - db
     volumes:
-      - /home/lucyna/.ssh/id_rsa:/data/id_rsa:ro
+      # klucz SSH tylko do odczytu
+      - ${DOCKER_CUSTOM_VOLUME}:${DOCKER_SSH_KEY}:ro
     environment:
       MONGO_URI: mongodb://db:27017/doves
+
       DOCKER_VIA: ssh
-      DOCKER_SSH_HOST:  192.168.68.64
-      DOCKER_SSH_USER: lucyna
-      DOCKER_SSH_KEY: /data/id_rsa
-      LAB_PATH: /home/lucyna/Docker_lab_v2/labs/lab-data
-      DOCKER_COMPOSE_CREATE_SCRIPT: /home/lucyna/Docker_lab_v2/labs/up.sh
-      DOCKER_COMPOSE_TEAR_DOWN_SCRIPT: /home/lucyna/Docker_lab_v2/labs/down.sh
-      DOCKER_COMPOSE_REBUILD_MACHINE_SCRIPT: /home/lucyna/Docker_lab_v2/labs/reset.sh
-      LP_DEFAULT_PASSWORD: qazwsx
+      DOCKER_SSH_HOST: ${DOCKER_SSH_HOST}
+      DOCKER_SSH_USER: ${DOCKER_SSH_USER}
+      DOCKER_SSH_KEY: ${DOCKER_SSH_KEY}
+
+      LAB_PATH: ${LAB_PATH}
+      DOCKER_COMPOSE_CREATE_SCRIPT: ${DOCKER_COMPOSE_CREATE_SCRIPT}
+      DOCKER_COMPOSE_TEAR_DOWN_SCRIPT: ${DOCKER_COMPOSE_TEAR_DOWN_SCRIPT}
+      DOCKER_COMPOSE_REBUILD_MACHINE_SCRIPT: ${DOCKER_COMPOSE_REBUILD_MACHINE_SCRIPT}
+
+      LP_DEFAULT_PASSWORD: ${PASSWORD}
     networks:
       - doves
 
   # =========================
-  # MONGODB
+  # MONGODB (DoVEs)
   # =========================
   db:
     image: mongo:7
@@ -62,37 +76,38 @@ services:
       - doves
 
   # =========================
-  # REVERSE PROXY
+  # REVERSE PROXY (nginx)
   # =========================
   proxy:
     build:
       context: ./doves/proxy
       args:
-        USERNAME: admin
-        PASSWORD: qazwsx
+        USERNAME: ${USERNAME}
+        PASSWORD: ${PASSWORD}
     restart: unless-stopped
     depends_on:
       - frontend
       - backend
+      - guacamole
     ports:
       - "8080:80"
     networks:
       - doves
 
   # =========================
-  # GUACD
+  # GUACD (Guacamole daemon)
   # =========================
   guacd:
     image: guacamole/guacd
     restart: unless-stopped
-    networks:
-      - guacnet
     volumes:
       - guacd_drive:/drive
       - guacd_record:/record
+    networks:
+      - guacnet
 
   # =========================
-  # POSTGRESQL (GUACAMOLE)
+  # POSTGRESQL (Guacamole DB)
   # =========================
   postgres:
     image: postgres:17
@@ -118,15 +133,18 @@ services:
     environment:
       GUACD_HOSTNAME: guacd
       GUACD_PORT: 4822
+
       POSTGRESQL_HOSTNAME: postgres
       POSTGRESQL_DATABASE: guacamole_db
       POSTGRESQL_USERNAME: guacamole
       POSTGRESQL_PASSWORD: guacamole
+    # port 8181 opcjonalny (do debugowania)
     ports:
       - "8181:8080"
     networks:
       - guacnet
       - doves
+
 
 
  
