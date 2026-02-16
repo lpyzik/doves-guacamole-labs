@@ -19,6 +19,7 @@ yarn-error.log*
 # =====================
 .env
 .env.*
+!.env.example
 id_rsa
 id_rsa.pub
 *.key
@@ -31,3 +32,7 @@ id_rsa.pub
 *.swp
 .DS_Store
 
+# =======================
+# Runtime / Docker data
+# =======================
+doves/data/
