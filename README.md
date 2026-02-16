@@ -244,13 +244,4 @@ dostęp przez przeglądarkę
 automatyzację laboratoriów
 
 
----
-
-Jeśli chcesz, w kolejnym kroku mogę:
-- przygotować **`.env.example`**
-- zrobić **README „dla studentów”**
-- dodać **diagram Mermaid**
-- uporządkować repozytorium pod publikację
-
-To README jest już **w pełni profesjonalne** i gotowe na GitHuba ✔
 
