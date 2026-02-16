@@ -1,0 +1,8 @@
+.warning-lp-unreachable {
+    display: flex;
+    background-color: rgb(168, 113, 40);
+    padding: 5px;
+    border-radius: 8px;
+    font-size: calc(1rem + 1px);
+    column-gap: 0.5rem;
+}

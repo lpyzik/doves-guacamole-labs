@@ -1,0 +1,86 @@
+.lab-brief {
+    margin: 8px;
+    display: block;
+    text-decoration: none !important;
+    color: inherit !important;
+    display: flex;
+    column-gap: 8px;
+    background-color:rgba(85, 85, 110, 0.8);
+    padding:1rem;
+    border-radius: 8px;
+    height: 2rem;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.lab-brief img {
+    height: 100%;
+    object-fit: contain;
+}
+
+
+@media (min-width:1024px) {
+    .lab-brief .name {
+        width: 8rem;
+        overflow: hidden;
+    }
+}
+
+.lab-brief .up {
+    font-weight: bold;
+    margin-left: 1rem;
+}
+
+.lab-brief .full-up {
+    color: rgb(92, 190, 92);
+}
+
+.lab-brief .m2h-up {
+    color: rgb(190, 190, 92);
+}
+
+
+.lab-brief .l2h-up {
+    color: rgb(190, 92, 92);
+}
+
+.lab-brief .link {
+    display: flex;
+    border-radius: 50%;
+    padding: 0.5rem;
+}
+
+.lab-brief .link:hover {
+    background-color:rgba(56, 56, 110, 0.8);
+    cursor: pointer;
+}
+
+.lab-create-button {
+    display: flex;
+    align-items: center;
+    color: rgb(224, 224, 224);
+    text-decoration: none;
+    font-size: 1.2rem;
+    background-color: rgb(78, 78, 78);
+    border: 1px solid rgb(126, 126, 126);
+    padding: 0.5rem;
+    border-radius: 8px;
+    margin: 0.5rem;
+    grid-column: 2;
+}
+
+.lab-create-button:hover {
+    background-color: rgb(92, 92, 92);
+}
+
+.lab-create-button img {
+    margin: 1rem;
+}
+
+@media (min-width:1024px)
+{
+    .create-button-container { 
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}

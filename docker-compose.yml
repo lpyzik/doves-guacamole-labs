@@ -1,0 +1,133 @@
+version: "3.9"
+
+networks:
+  doves:
+    driver: bridge
+  guacnet:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  doves_data:
+  guacd_drive:
+  guacd_record:
+
+services:
+  # =========================
+  # FRONTEND
+  # =========================
+  frontend:
+    build:
+      context: ./doves/doves-frontend
+      args:
+        REACT_APP_DOVES_API_URL: /api
+    restart: unless-stopped
+    networks:
+      - doves
+
+  # =========================
+  # BACKEND
+  # =========================
+  backend:
+    build:
+      context: ./doves/DoVEs-backend
+    restart: unless-stopped
+    depends_on:
+      - db
+    volumes:
+      - /home/lucyna/.ssh/id_rsa:/data/id_rsa:ro
+    environment:
+      MONGO_URI: mongodb://db:27017/doves
+      DOCKER_VIA: ssh
+      DOCKER_SSH_HOST:  192.168.68.64
+      DOCKER_SSH_USER: lucyna
+      DOCKER_SSH_KEY: /data/id_rsa
+      LAB_PATH: /home/lucyna/Docker_lab_v2/labs/lab-data
+      DOCKER_COMPOSE_CREATE_SCRIPT: /home/lucyna/Docker_lab_v2/labs/up.sh
+      DOCKER_COMPOSE_TEAR_DOWN_SCRIPT: /home/lucyna/Docker_lab_v2/labs/down.sh
+      DOCKER_COMPOSE_REBUILD_MACHINE_SCRIPT: /home/lucyna/Docker_lab_v2/labs/reset.sh
+      LP_DEFAULT_PASSWORD: qazwsx
+    networks:
+      - doves
+
+  # =========================
+  # MONGODB
+  # =========================
+  db:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - doves_data:/data/db
+    networks:
+      - doves
+
+  # =========================
+  # REVERSE PROXY
+  # =========================
+  proxy:
+    build:
+      context: ./doves/proxy
+      args:
+        USERNAME: admin
+        PASSWORD: qazwsx
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "8080:80"
+    networks:
+      - doves
+
+  # =========================
+  # GUACD
+  # =========================
+  guacd:
+    image: guacamole/guacd
+    restart: unless-stopped
+    networks:
+      - guacnet
+    volumes:
+      - guacd_drive:/drive
+      - guacd_record:/record
+
+  # =========================
+  # POSTGRESQL (GUACAMOLE)
+  # =========================
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: guacamole_db
+      POSTGRES_USER: guacamole
+      POSTGRES_PASSWORD: guacamole
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - guacnet
+
+  # =========================
+  # GUACAMOLE WEB
+  # =========================
+  guacamole:
+    image: guacamole/guacamole
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - guacd
+    environment:
+      GUACD_HOSTNAME: guacd
+      GUACD_PORT: 4822
+      POSTGRESQL_HOSTNAME: postgres
+      POSTGRESQL_DATABASE: guacamole_db
+      POSTGRESQL_USERNAME: guacamole
+      POSTGRESQL_PASSWORD: guacamole
+    ports:
+      - "8181:8080"
+    networks:
+      - guacnet
+      - doves
+
+
+ 
+

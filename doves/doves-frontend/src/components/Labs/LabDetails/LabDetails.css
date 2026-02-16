@@ -1,0 +1,113 @@
+@media (min-width:1024px) {
+    .lab-details-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 10px;
+        row-gap: 10px;
+    }   
+}
+
+.summary-table {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.summary-cell {
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.summary-key.light {
+    background-color:rgb(92, 92, 92);
+}
+
+.summary-value.light {
+    background-color:rgb(110, 110, 110);
+}
+
+.summary-key.dark {
+    background-color:rgb(49, 49, 49);
+}
+
+.summary-value.dark {
+    background-color:rgb(67, 67, 67);
+}
+
+.summary-value.full-up {
+    color: rgb(0, 228, 30);
+    font-weight: bold;
+}
+
+.summary-value.m2h-up {
+    color: rgb(204, 173, 0);
+    font-weight: bold;
+}
+
+.summary-value.l2h-up {
+    color: rgb(133, 8, 8);
+    font-weight: bold;
+}
+
+.actions-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    flex-direction: row;
+    column-gap: 0.7rem;
+    row-gap: 0.7rem;
+}
+
+.actions-container button {
+    background-color: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: inherit;
+}
+
+.action-button {
+    color: inherit;
+    padding: 0.5rem;
+    border: 1px solid rgb(126, 126, 126);
+    border-radius: 8px;
+    height: 1.5rem;
+    display:flex;
+    align-items: center;
+    column-gap: 0.3rem;
+    background-color: rgba(63, 63, 168, 0.1);
+}
+
+.action-button:hover {
+    cursor: pointer;
+    background-color: rgba(63, 63, 168, 0.4)
+}
+
+.action-button.dangerous {
+    background-color: rgba(168, 63, 63, 0.1);
+}
+
+.action-button.dangerous:hover {
+    background-color: rgba(168, 63, 63, 0.4);
+}
+
+.machines-grid-cell {
+    grid-column: 1/3;
+}
+
+.lab-brief .machine-running {
+    color: rgb(92, 190, 92);
+}
+
+.lab-brief .machine-stopped {
+    color: rgb(190, 190, 92);
+}
+
+
+.lab-brief .machine-error {
+    color: rgb(190, 92, 92);
+}

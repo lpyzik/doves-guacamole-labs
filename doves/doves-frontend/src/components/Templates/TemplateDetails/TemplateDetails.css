@@ -1,0 +1,9 @@
+.machine-def {
+    background-color:rgba(85, 85, 110, 0.8);
+    margin: 8px;
+    border-radius: 8px;
+}
+
+.ab-href {
+    all:unset;
+}

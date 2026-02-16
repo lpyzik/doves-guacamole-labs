@@ -1,0 +1,112 @@
+version: '3'
+
+networks:
+  doves:
+    driver: bridge
+  guacnet:
+    driver: bridge
+
+
+
+services:
+  frontend:
+    build:
+      context: ./doves/doves-frontend
+      args:
+        - REACT_APP_DOVES_API_URL=http://192.168.1.104:8080/api
+    restart: unless-stopped
+    networks:
+      - doves
+
+  backend:
+    build:
+      context: ./doves/DoVEs-backend
+    restart: unless-stopped
+    volumes:
+      - /home/lucyna/.ssh/id_rsa:/data/id_rsa:ro
+    networks:
+      - doves
+    depends_on:
+      - db
+    environment:
+      - MONGO_URI=mongodb://db:27017/doves
+      - DOCKER_VIA=ssh
+      - DOCKER_SSH_HOST=192.168.1.104
+      - DOCKER_SSH_USER=lucyna
+      - DOCKER_SSH_KEY=/data/id_rsa
+      - LAB_PATH=/home/lucyna/Docker_lab_v2/labs/lab-data
+      - DOCKER_COMPOSE_CREATE_SCRIPT=/home/lucyna/Docker_lab_v2/labs/up.sh
+      - DOCKER_COMPOSE_TEAR_DOWN_SCRIPT=/home/lucyna/Docker_lab_v2/labs/down.sh
+      - DOCKER_COMPOSE_REBUILD_MACHINE_SCRIPT=/home/lucyna/Docker_lab_v2/labs/reset.sh
+      - LP_DEFAULT_PASSWORD=qazwsx
+
+  db:
+    image: mongo
+    volumes:
+      - doves_data:/data/db
+    networks:
+      - doves
+    restart: unless-stopped
+
+  proxy:
+    build:
+      context: ./doves/proxy
+      args:
+        - USERNAME=admin
+        - PASSWORD=qazwsx
+    ports:
+      - '8080:80'
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - doves
+    restart: unless-stopped
+
+  guacamole:
+    image: guacamole/guacamole
+    depends_on:
+      - postgres
+      - guacd
+    environment:
+      GUACD_HOSTNAME: guacd
+      GUACD_PORT: 4822
+      POSTGRESQL_HOSTNAME: postgres
+      POSTGRESQL_DATABASE: guacamole_db
+      POSTGRESQL_USERNAME: guacamole
+      POSTGRESQL_PASSWORD: guacamole
+    ports:
+      - "8181:8080"
+    networks:
+      - guacnet
+    restart: unless-stopped
+
+  guacd:
+    image: guacamole/guacd
+    networks:
+      - guacnet
+    volumes:
+      - guacd_drive:/drive
+      - guacd_record:/record
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17
+    container_name: docker_lab_v2-postgres-1
+    environment:
+      POSTGRES_DB: guacamole_db
+      POSTGRES_USER: guacamole
+      POSTGRES_PASSWORD: guacamole
+
+    restart: unless-stopped
+    networks:
+      - guacnet
+volumes:
+  postgres_data:
+  guac_postgres_data:
+  doves_data:
+  guacd_drive:
+  guacd_record:
+
+ 
+
